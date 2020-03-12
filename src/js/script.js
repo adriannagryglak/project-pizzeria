@@ -96,6 +96,7 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
     }
 
     initAccordion() {
@@ -170,7 +171,7 @@
       for (let paramId in thisProduct.data.params) {
 
         /* save the element in thisProduct.data.params with key paramId as const param */
-        const param = thisProduct.data.params[paramId]
+        const param = thisProduct.data.params[paramId];
 
         /* START LOOP: for each optionId in param.options */
         for (let optionId in param.options) {
@@ -194,15 +195,26 @@
 
             /* END ELSE IF: if option is not selected and option is default */
           }
-          /* END LOOP: for each optionId in param.options */
+
+
+          const selectedImg = thisProduct.imageWrapper.querySelectorAll(`.${paramId}-${optionId}`);
+
+          if (optSelected) {
+
+            for (let image in selectedImg) {
+              image.classList.add(classNames.menuProduct.imageVisible);
+            }
+
+          } else {
+
+            for (let image in selectedImg) {
+              image.classList.remove(classNames.menuProduct.imageVisible);
+            }
+          }
         }
-        /* END LOOP: for each paramId in thisProduct.data.params */
       }
-      /* set the contents of thisProduct.priceElem to be the value of variable price */
 
       thisProduct.priceElem.innerHTML = price;
-      console.log('price', price);
-      console.log('priceelement:', thisProduct.priceElem);
     }
 
   }
