@@ -201,13 +201,13 @@
 
           if (optSelected) {
 
-            for (let image in selectedImg) {
+            for (let image of selectedImg) {
               image.classList.add(classNames.menuProduct.imageVisible);
             }
 
           } else {
 
-            for (let image in selectedImg) {
+            for (let image of selectedImg) {
               image.classList.remove(classNames.menuProduct.imageVisible);
             }
           }
