@@ -1,6 +1,17 @@
-import {Product} from './components/Product.js';
-import {Cart} from './components/Cart.js';
-import {select, settings} from './settings.js';
+import {
+  Product
+} from './components/Product.js';
+import {
+  Cart
+} from './components/Cart.js';
+import {
+  select,
+  settings,
+  classNames
+} from './settings.js';
+import {
+  Booking
+} from './components/Booking.js';
 
 const app = {
   initMenu: function () {
@@ -41,9 +52,59 @@ const app = {
 
     thisApp.productList = document.querySelector(select.containerOf.menu);
 
-    thisApp.productList.addEventListener('add-to-cart', function(event){
+    thisApp.productList.addEventListener('add-to-cart', function (event) {
       app.cart.add(event.detail.product);
     });
+  },
+
+  initPages() {
+    const thisApp = this;
+
+    thisApp.pages = Array.from(document.querySelector(select.containerOf.pages).children);
+    thisApp.navLinks = Array.from(document.querySelectorAll(select.nav.links));
+
+    //thisApp.activatePage(thisApp.pages[0].id); change for:
+    let pagesMatchingHash = [];
+    if (window.location.hash.length > 2) {
+      const idFromHash = window.location.hash.replace('#/', '');
+
+      pagesMatchingHash = thisApp.pages.filter(function (page) {
+        return page.id == idFromHash;
+      });
+
+      thisApp.activatePage(pagesMatchingHash.length ? pagesMatchingHash[0].id : thisApp.pages[0].id);
+    }
+
+    for (let link of thisApp.navLinks) {
+      link.addEventListener('click', function (event) {
+        const clickedElement = this;
+        event.preventDefault();
+
+        // tO DO get page id from href
+        const href = clickedElement.getAttribute('href');
+
+        const id = href.replace('#', '');
+
+        //tO DO activate page
+        thisApp.activatePage(id);
+      });
+    }
+  },
+
+  activatePage(pageId) {
+    const thisApp = this;
+
+    for (let link of thisApp.navLinks) {
+      link.classList.toggle(classNames.nav.active, link.getAttribute('href') == '#' + pageId);
+    }
+
+    for (let page of thisApp.pages) {
+      page.classList.toggle(classNames.pages.active, page.getAttribute('id') == pageId);
+    }
+
+    window.location.hash = '#/' + pageId;
+
+    console.log('aktywowano podstronę:', pageId);
   },
 
   init: function () { //lista tresci skryptu
@@ -53,10 +114,24 @@ const app = {
     // console.log('classNames:', classNames);
     // console.log('settings:', settings);
     // console.log('templates:', templates);
-
+    thisApp.initPages();
     thisApp.initData();
     thisApp.initCart();
+    thisApp.initBooking();
   },
+
+  initBooking() {
+    //znajduje kontener widgetu do rezerwacji stron, którego selektor mamy zapisany w select.containerOf.booking,
+
+    const widgetContainer = document.querySelector(select.containerOf.booking);
+
+    //tworzy nową instancję klasy Booking, którą za chwilę stworzymy, przekazując jej konstruktorowi znaleziony kontener widgetu,
+
+    new Booking(widgetContainer);
+
+    //jest wykonywana na końcu metody app.init.
+  },
+
 };
 
 app.init();
