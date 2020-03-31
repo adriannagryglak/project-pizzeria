@@ -13,7 +13,7 @@ export class BaseWidget {
     return thisWidget.correctValue;
   }
 
-  set value(assignedValue) {
+  set value(assignedValue) { 
     const thisWidget = this;
 
     const newValue = thisWidget.parseValue(assignedValue);
@@ -25,7 +25,7 @@ export class BaseWidget {
     thisWidget.renderValue();
   }
 
-  parseValue(newValue) {
+  parseValue(newValue) { 
     return parseInt(newValue);
   }
 
@@ -46,7 +46,7 @@ export class BaseWidget {
       bubbles: true
     });
     
-    thisWidget.dom.wrapper.dispatchEvent(event);
+    thisWidget.dom.wrapper.dispatchEvent(event); 
   }
 
 }

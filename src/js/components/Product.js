@@ -25,7 +25,7 @@ export class Product {
     thisProduct.initAmountWidget();
     thisProduct.processOrder();
 
-    console.log('new product:', thisProduct);
+    //console.log('new product:', thisProduct);
   }
 
   renderInMenu() {
