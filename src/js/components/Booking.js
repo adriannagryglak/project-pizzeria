@@ -1,7 +1,8 @@
 import {
   templates,
   select,
-  settings
+  settings,
+  classNames
 } from '../settings.js';
 import {
   utils
@@ -57,6 +58,8 @@ export class Booking {
 
     thisBooking.dom.hourPicker = element.querySelector(select.widgets.hourPicker.wrapper);
 
+    thisBooking.dom.tables = element.querySelectorAll(select.booking.tables);
+
   }
 
   initWidgets() {
@@ -69,6 +72,10 @@ export class Booking {
 
     thisBooking.datePicker = new DatePicker(thisBooking.dom.datePicker);
     thisBooking.hourPicker = new HourPicker(thisBooking.dom.hourPicker);
+
+    thisBooking.dom.wrapper.addEventListener('updated', function () {
+      thisBooking.updateDOM();
+    });
 
   }
 
@@ -150,6 +157,7 @@ export class Booking {
     }
 
     console.log('events BOOKED', thisBooking.booked);
+    thisBooking.updateDOM(); //to initiate updatedom even when we reloud the site
   }
 
 
@@ -176,5 +184,30 @@ export class Booking {
 
   }
 
+  updateDOM() {
+    const thisBooking = this;
 
+    console.log('updated dom');
+
+    thisBooking.date = thisBooking.datePicker.value;
+    thisBooking.hour = utils.hourToNumber(thisBooking.hourPicker.value); //aktualne data i h
+
+
+    //Następnie napisz pętlę iterującą przez wszystkie elementy z thisBooking.dom.tables. Numer stolika możesz pobierać z atrybutu tego elementu, którego nazwa jest zapisana w settings.booking.tableIdAttribute.
+
+    for (let table of thisBooking.dom.tables) {
+      let tableNr = table.getAttribute(settings.booking.tableIdAttribute);
+      
+      if (!isNaN(tableNr)) {
+        tableNr = parseInt(tableNr);
+      }
+
+      if (typeof thisBooking.booked[thisBooking.date] !== 'undefined' && typeof thisBooking.booked[thisBooking.date][thisBooking.hour] !== 'undefined' && thisBooking.booked[thisBooking.date][thisBooking.hour].indexOf(tableNr) > -1) {
+        table.classList.add(classNames.booking.tableBooked);
+      } else {
+        table.classList.remove(classNames.booking.tableBooked);
+      }
+
+    }
+  }
 }
