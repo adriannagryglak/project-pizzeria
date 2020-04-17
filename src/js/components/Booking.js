@@ -53,12 +53,14 @@ export class Booking {
     //analogicznie do peopleAmount znaleźć i zapisać element dla hoursAmount.
 
     thisBooking.dom.hoursAmount = element.querySelector(select.booking.hoursAmount);
-
     thisBooking.dom.datePicker = element.querySelector(select.widgets.datePicker.wrapper);
-
     thisBooking.dom.hourPicker = element.querySelector(select.widgets.hourPicker.wrapper);
-
     thisBooking.dom.tables = element.querySelectorAll(select.booking.tables);
+    thisBooking.dom.address = element.querySelector(select.booking.address);
+    thisBooking.dom.phone = element.querySelector(select.booking.phone);
+    thisBooking.dom.starters = element.querySelectorAll(select.booking.starter);
+
+
 
   }
 
@@ -75,6 +77,12 @@ export class Booking {
 
     thisBooking.dom.wrapper.addEventListener('updated', function () {
       thisBooking.updateDOM();
+    });
+
+    thisBooking.dom.wrapper.addEventListener('submit', function () {
+      event.preventDefault();
+      thisBooking.sendBooking();
+      thisBooking.getData();
     });
 
   }
@@ -95,7 +103,7 @@ export class Booking {
       eventsRepeat: settings.db.repeatParam + '&' + utils.queryParams(endDate),
     };
 
-    console.log('getData params', params);
+    //console.log('getData params', params);
 
     const urls = { //pelne adresy zapytan
       booking: settings.db.url + '/' + settings.db.booking + '?' + params.booking,
@@ -103,7 +111,7 @@ export class Booking {
       eventsRepeat: settings.db.url + '/' + settings.db.event + '?' + params.eventsRepeat,
     };
 
-    console.log('getData urls', urls);
+    //console.log('getData urls', urls);
 
     Promise.all([
       fetch(urls.booking),
@@ -122,23 +130,21 @@ export class Booking {
       });
   }
 
-
-
   parseData(bookings, eventsCurrent, eventsRepeat) { //three arrays with data received from API 
     const thisBooking = this;
 
     thisBooking.booked = {};
-    console.log('current events : ', eventsCurrent);
+    //console.log('current events : ', eventsCurrent);
 
     for (let event of eventsCurrent) {
 
-      console.log('event from events current', event);
+      //console.log('event from events current', event);
       thisBooking.makeBooked(event.date, event.hour, event.table, event.duration);
     }
 
 
     for (let event of bookings) {
-      console.log('event from bookings', event);
+      //console.log('event from bookings', event);
       thisBooking.makeBooked(event.date, event.hour, event.table, event.duration);
     }
 
@@ -147,7 +153,7 @@ export class Booking {
 
       const minDate = thisBooking.datePicker.minDate;
       const maxDate = thisBooking.datePicker.maxDate;
-      console.log('event from events repeat', event);
+      //console.log('event from events repeat', event);
 
       if (event.repeat == 'daily') {
         for (let dayDate = minDate; dayDate <= maxDate; dayDate = utils.addDays(dayDate, 1)) {
@@ -159,8 +165,6 @@ export class Booking {
     console.log('events BOOKED', thisBooking.booked);
     thisBooking.updateDOM(); //to initiate updatedom even when we reloud the site
   }
-
-
 
   makeBooked(date, hour, table, duration) {
     const thisBooking = this;
@@ -192,12 +196,9 @@ export class Booking {
     thisBooking.date = thisBooking.datePicker.value;
     thisBooking.hour = utils.hourToNumber(thisBooking.hourPicker.value); //aktualne data i h
 
-
-    //Następnie napisz pętlę iterującą przez wszystkie elementy z thisBooking.dom.tables. Numer stolika możesz pobierać z atrybutu tego elementu, którego nazwa jest zapisana w settings.booking.tableIdAttribute.
-
     for (let table of thisBooking.dom.tables) {
       let tableNr = table.getAttribute(settings.booking.tableIdAttribute);
-      
+
       if (!isNaN(tableNr)) {
         tableNr = parseInt(tableNr);
       }
@@ -206,8 +207,64 @@ export class Booking {
         table.classList.add(classNames.booking.tableBooked);
       } else {
         table.classList.remove(classNames.booking.tableBooked);
+        table.classList.remove(classNames.booking.tableChoosed);
       }
 
+      //miejsce w ktorym mam potrzebne rzeczy
+
+      table.addEventListener('click', function () {
+        console.log('KLIKNELAM W STOL');
+        // table.classList.toggle(classNames.booking.tableChoosed);
+
+        const tableChoosed = table.classList.contains(classNames.booking.tableBooked);
+        if (!tableChoosed) {
+          table.classList.add(classNames.booking.tableBooked);
+          table.classList.add(classNames.booking.tableChoosed);
+          thisBooking.tableIsBooked = tableNr;
+        }
+      });
     }
+
   }
+
+  sendBooking() {
+    const thisBooking = this;
+    const url = settings.db.url + '/' + settings.db.booking;
+
+    const payload = {
+      date: thisBooking.date,
+      hour: utils.numberToHour(thisBooking.hour),
+      table: thisBooking.tableIsBooked,
+      duration: thisBooking.hoursAmount.value,
+      ppl: thisBooking.peopleAmount.value,
+      starters: [],
+      address: thisBooking.dom.address.value,
+      phone: thisBooking.dom.phone.value,
+    };
+
+    for (let starter of thisBooking.dom.starters) {
+      if (starter.checked == true) {
+        payload.starters.push(starter.value);
+      }
+    }
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    };
+
+    fetch(url, options)
+      .then(function (response) {
+        return response.json();
+      }).then(function (parsedResponse) {
+        console.log('parsedResponseBOOKING', parsedResponse);
+        thisBooking.makeBooked(payload.date, payload.hour, payload.table, payload.duration);
+      });
+
+    
+  }
+
 }

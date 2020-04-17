@@ -1,4 +1,4 @@
-/* global Handlebars*/
+/* global Handlebars, dataSource*/
 
 export const utils = {}; // eslint-disable-line no-unused-vars
 
@@ -42,14 +42,14 @@ utils.queryParams = function (params) {
     .join('&');
 };
 
-/*utils.convertDataSourceToDbJson = function(){
+utils.convertDataSourceToDbJson = function(){
   const productJson = [];
   for(let key in dataSource.products){
     productJson.push(Object.assign({id: key}, dataSource.products[key]));
   }
 
   console.log(JSON.stringify({product: productJson, order: []}, null, '  '));
-};*/
+};
 
 utils.numberToHour = function (number) {
   return (Math.floor(number) % 24) + ':' + (number % 1 * 60 + '').padStart(2, '0');

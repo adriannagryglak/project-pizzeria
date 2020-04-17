@@ -1,3 +1,4 @@
+/* global $*/
 import {
   Product
 } from './components/Product.js';
@@ -34,7 +35,7 @@ const app = {
         return rawResponse.json();
       })
       .then(function (parsedResponse) {
-        console.log('parsedResponse:', parsedResponse);
+        //console.log('parsedResponse:', parsedResponse);
         //save parsedreposne as thisapp.data.products
         thisApp.data.products = parsedResponse;
         //execute init menu method
@@ -63,19 +64,19 @@ const app = {
     thisApp.pages = Array.from(document.querySelector(select.containerOf.pages).children);
     thisApp.navLinks = Array.from(document.querySelectorAll(select.nav.links));
 
-    //thisApp.activatePage(thisApp.pages[0].id); change for:
+    //thisApp.activatePage(thisApp.pages[0].id); - aktywujemy 1 podstrone z szeregu naszego. change for:
     let pagesMatchingHash = [];
+
     if (window.location.hash.length > 2) {
       const idFromHash = window.location.hash.replace('#/', '');
 
       pagesMatchingHash = thisApp.pages.filter(function (page) {
         return page.id == idFromHash;
       });
-
       thisApp.activatePage(pagesMatchingHash.length ? pagesMatchingHash[0].id : thisApp.pages[0].id);
     }
 
-    for (let link of thisApp.navLinks) {
+    for (let link of thisApp.navLinks) { //wywołanie strony po kliknięciu na link w zasadzie. 
       link.addEventListener('click', function (event) {
         const clickedElement = this;
         event.preventDefault();
@@ -95,16 +96,25 @@ const app = {
     const thisApp = this;
 
     for (let link of thisApp.navLinks) {
-      link.classList.toggle(classNames.nav.active, link.getAttribute('href') == '#' + pageId);
+      link.classList.toggle(classNames.nav.active, link.getAttribute('href') == '#' + pageId); //jeśli link jest taki sam jak id naszej podstrony nadaj mu klasę active.
     }
 
     for (let page of thisApp.pages) {
-      page.classList.toggle(classNames.pages.active, page.getAttribute('id') == pageId);
+      page.classList.toggle(classNames.pages.active, page.getAttribute('id') == pageId); //jesli id strony jest równe naszemy pageId czyli argumentowi tej funckji nadajemy jej klase active.
     }
 
-    window.location.hash = '#/' + pageId;
+    window.location.hash = '#/' + pageId; //zeby po odswiezeniu nie zmieniala sie podstrona i nie przewijała do elementu o id booking tylko pokazywala z samej gory
 
     console.log('aktywowano podstronę:', pageId);
+    const mainSite = document.getElementById('main-site');
+    const cart = document.getElementById('cart');
+    if (pageId.length == 5) {
+      mainSite.innerHTML = '';
+    } else {
+      mainSite.innerHTML = '';
+      cart.remove();
+    }
+
   },
 
   init: function () { //lista tresci skryptu
@@ -118,6 +128,7 @@ const app = {
     thisApp.initData();
     thisApp.initCart();
     thisApp.initBooking();
+    thisApp.initMainSite();
   },
 
   initBooking() {
@@ -132,6 +143,15 @@ const app = {
     //jest wykonywana na końcu metody app.init.
   },
 
+  initMainSite() {
+
+    $('.carousel').carousel({
+      interval: 3000
+    });
+  },
+
 };
+
+
 
 app.init();
