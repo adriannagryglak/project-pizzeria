@@ -103,7 +103,6 @@ export class Booking {
       eventsRepeat: settings.db.repeatParam + '&' + utils.queryParams(endDate),
     };
 
-    //console.log('getData params', params);
 
     const urls = { //pelne adresy zapytan
       booking: settings.db.url + '/' + settings.db.booking + '?' + params.booking,
