@@ -8,7 +8,8 @@ import {
 import {
   select,
   settings,
-  classNames
+  classNames,
+  templates
 } from './settings.js';
 import {
   Booking
@@ -63,7 +64,7 @@ const app = {
 
     thisApp.pages = Array.from(document.querySelector(select.containerOf.pages).children);
     thisApp.navLinks = Array.from(document.querySelectorAll(select.nav.links));
-
+    thisApp.activatePage(thisApp.pages[0].id);
     //thisApp.activatePage(thisApp.pages[0].id); - aktywujemy 1 podstrone z szeregu naszego. change for:
     let pagesMatchingHash = [];
 
@@ -76,7 +77,7 @@ const app = {
       thisApp.activatePage(pagesMatchingHash.length ? pagesMatchingHash[0].id : thisApp.pages[0].id);
     }
 
-    for (let link of thisApp.navLinks) { //wywołanie strony po kliknięciu na link w zasadzie. 
+    for (let link of thisApp.navLinks) { //wywołanie strony po kliknięciu na link w zasadzie.
       link.addEventListener('click', function (event) {
         const clickedElement = this;
         event.preventDefault();
@@ -88,6 +89,11 @@ const app = {
 
         //tO DO activate page
         thisApp.activatePage(id);
+
+        if (id.length == 5) {
+          const cart = document.getElementById('cart');
+          cart.classList.add('exist');
+        }
       });
     }
   },
@@ -106,29 +112,20 @@ const app = {
     window.location.hash = '#/' + pageId; //zeby po odswiezeniu nie zmieniala sie podstrona i nie przewijała do elementu o id booking tylko pokazywala z samej gory
 
     console.log('aktywowano podstronę:', pageId);
-    const mainSite = document.getElementById('main-site');
-    const cart = document.getElementById('cart');
-    if (pageId.length == 5) {
-      mainSite.innerHTML = '';
-    } else {
-      mainSite.innerHTML = '';
-      cart.remove();
-    }
-
   },
 
   init: function () { //lista tresci skryptu
     const thisApp = this;
-    // console.log('*** App starting ***');
-    // console.log('thisApp:', thisApp);
-    // console.log('classNames:', classNames);
-    // console.log('settings:', settings);
-    // console.log('templates:', templates);
+    console.log('*** App starting ***');
+    console.log('thisApp:', thisApp);
+    console.log('classNames:', classNames);
+    console.log('settings:', settings);
+    console.log('templates:', templates);
     thisApp.initPages();
     thisApp.initData();
     thisApp.initCart();
     thisApp.initBooking();
-    thisApp.initMainSite();
+    thisApp.initCarousel();
   },
 
   initBooking() {
@@ -143,15 +140,19 @@ const app = {
     //jest wykonywana na końcu metody app.init.
   },
 
-  initMainSite() {
-
+  initCarousel() {
+    const thisApp = this;
     $('.carousel').carousel({
       interval: 3000
     });
-  },
+
+    const logo = document.querySelector('.logo');
+
+    logo.addEventListener('click', function () {
+      thisApp.initPages();
+    });
+  }
 
 };
-
-
 
 app.init();
